@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administrative Origins - Organization</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Administrative Origins</h1>
+            <p>A large-scale linked administrative dataset of the U.S. federal workforce</p>
+        </div>
+    </header>
+
+    <nav>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="individual.html">Individual</a></li>
+            <li><a href="organization.html" class="active">Organization</a></li>
+            <li><a href="occupation.html">Occupation</a></li>
+            <li><a href="clean.html">Clean</a></li>
+            <li><a href="civil-service-protections.html">Civil Service Protections</a></li>
+            <li><a href="census.html">Census</a></li>
+            <li><a href="legislation.html">Legislation</a></li>
+            <li><a href="oversight.html">Oversight</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <section>
+            <h2>Organization<span class="status-badge">In progress</span></h2>
+            <p>This step documents how organizational units (departments, agencies, sub-agencies, bureaus) are identified, standardized, and tracked through reorganizations, renamings, and mergers. Describe the crosswalks used to harmonize organization codes across years.</p>
+        </section>
+
+        <section>
+            <h3>Steps</h3>
+            <ol>
+                <li>Extract raw organizational codes from source files.</li>
+                <li>Build a crosswalk to harmonize codes across reorganizations.</li>
+                <li>Assign a consistent organization hierarchy (department > agency > sub-agency).</li>
+                <li>Flag known mergers, splits, and renamings.</li>
+            </ol>
+        </section>
+
+        <section>
+            <h3>Replication code</h3>
+            <p>The snippet below is a starting placeholder &mdash; replace it with the actual script(s) used for this step, or link out to a script file in this repository (e.g. <code>code/organization.py</code>).</p>
+            <pre><code># Placeholder: organization crosswalk construction
+
+def harmonize_org_codes(df, crosswalk_path):
+    crosswalk = pd.read_csv(crosswalk_path)
+    df = df.merge(crosswalk, on='raw_org_code', how='left')
+    return df
+</code></pre>
+        </section>
+
+        <section>
+            <h3>Data &amp; downloads</h3>
+            <p>Add links here to any intermediate or output files associated with this step (e.g., crosswalks, lookup tables, or the cleaned output of this stage).</p>
+        </section>
+
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy; Administrative Origins Project</p>
+            <p>Last updated: [Month Year]</p>
+        </div>
+    </footer>
+</body>
+</html>
+
