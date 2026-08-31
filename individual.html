@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administrative Origins - Individual</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Administrative Origins</h1>
+            <p>A large-scale linked administrative dataset of the U.S. federal workforce</p>
+        </div>
+    </header>
+
+    <nav>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="individual.html" class="active">Individual</a></li>
+            <li><a href="organization.html">Organization</a></li>
+            <li><a href="occupation.html">Occupation</a></li>
+            <li><a href="clean.html">Clean</a></li>
+            <li><a href="civil-service-protections.html">Civil Service Protections</a></li>
+            <li><a href="census.html">Census</a></li>
+            <li><a href="legislation.html">Legislation</a></li>
+            <li><a href="oversight.html">Oversight</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <section>
+            <h2>Individual<span class="status-badge">In progress</span></h2>
+            <p>This step builds the individual-level backbone of the dataset: one consistent record per federal employee, disambiguated across name variants, agencies, and time. Describe here the source files, identifier construction, and name-matching / entity-resolution approach used to link individuals across years.</p>
+        </section>
+
+        <section>
+            <h3>Steps</h3>
+            <ol>
+                <li>Ingest raw source files for each fiscal year/quarter.</li>
+                <li>Standardize name, agency, and position fields.</li>
+                <li>Disambiguate and link individuals across time using [matching method].</li>
+                <li>Assign a stable person-level identifier.</li>
+                <li>Validate linkage rates and spot-check a random sample.</li>
+            </ol>
+        </section>
+
+        <section>
+            <h3>Replication code</h3>
+            <p>The snippet below is a starting placeholder &mdash; replace it with the actual script(s) used for this step, or link out to a script file in this repository (e.g. <code>code/individual.py</code>).</p>
+            <pre><code># Placeholder: individual-level linkage pipeline
+# Replace with your actual replication code
+
+import pandas as pd
+
+def build_individual_panel(raw_paths):
+    frames = [pd.read_csv(p) for p in raw_paths]
+    df = pd.concat(frames, ignore_index=True)
+    # standardize + link individuals here
+    return df
+</code></pre>
+        </section>
+
+        <section>
+            <h3>Data &amp; downloads</h3>
+            <p>Add links here to any intermediate or output files associated with this step (e.g., crosswalks, lookup tables, or the cleaned output of this stage).</p>
+        </section>
+
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy; Administrative Origins Project</p>
+            <p>Last updated: [Month Year]</p>
+        </div>
+    </footer>
+</body>
+</html>
+
