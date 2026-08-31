@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administrative Origins - Civil Service Protections</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Administrative Origins</h1>
+            <p>A large-scale linked administrative dataset of the U.S. federal workforce</p>
+        </div>
+    </header>
+
+    <nav>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="individual.html">Individual</a></li>
+            <li><a href="organization.html">Organization</a></li>
+            <li><a href="occupation.html">Occupation</a></li>
+            <li><a href="clean.html">Clean</a></li>
+            <li><a href="civil-service-protections.html" class="active">Civil Service Protections</a></li>
+            <li><a href="census.html">Census</a></li>
+            <li><a href="legislation.html">Legislation</a></li>
+            <li><a href="oversight.html">Oversight</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <section>
+            <h2>Civil Service Protections<span class="status-badge">In progress</span></h2>
+            <p>This step documents how appointment type (competitive service, excepted service, Schedule A/C/F, SES, etc.) and civil service protections are coded, including any changes in classification rules over the sample period.</p>
+        </section>
+
+        <section>
+            <h3>Steps</h3>
+            <ol>
+                <li>Extract raw appointment-type and schedule codes.</li>
+                <li>Classify records into competitive vs. excepted service.</li>
+                <li>Flag politically appointed and at-will positions.</li>
+                <li>Document rule changes affecting classification over time.</li>
+            </ol>
+        </section>
+
+        <section>
+            <h3>Replication code</h3>
+            <p>The snippet below is a starting placeholder &mdash; replace it with the actual script(s) used for this step, or link out to a script file in this repository (e.g. <code>code/civil-service-protections.py</code>).</p>
+            <pre><code># Placeholder: civil service protection classification
+
+PROTECTED_SCHEDULES = {'Competitive', 'SES-Career'}
+
+def flag_protected(df):
+    df['protected'] = df['appointment_type'].isin(PROTECTED_SCHEDULES)
+    return df
+</code></pre>
+        </section>
+
+        <section>
+            <h3>Data &amp; downloads</h3>
+            <p>Add links here to any intermediate or output files associated with this step (e.g., crosswalks, lookup tables, or the cleaned output of this stage).</p>
+        </section>
+
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy; Administrative Origins Project</p>
+            <p>Last updated: [Month Year]</p>
+        </div>
+    </footer>
+</body>
+</html>
+
