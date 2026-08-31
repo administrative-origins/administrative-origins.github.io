@@ -1,0 +1,240 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Cambria Math', 'Cambria', serif;
+    line-height: 1.6;
+    color: #333;
+    background-color: #f9f9f9;
+}
+
+p {
+    margin-bottom: 1rem;
+}
+
+a {
+    color: #8080cc;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+header {
+    background: linear-gradient(135deg, #8080cc 0%, #7070bb 100%);
+    color: white;
+    padding: 2.5rem 0 2rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+.container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+}
+
+header p {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    margin-bottom: 0;
+}
+
+nav {
+    background-color: white;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+nav ul {
+    list-style: none;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+nav li {
+    margin: 0;
+}
+
+nav a {
+    display: block;
+    padding: 1rem 1.25rem;
+    color: #8080cc;
+    text-decoration: none;
+    transition: background-color 0.3s, color 0.3s;
+    font-weight: 500;
+    font-size: 0.95rem;
+}
+
+nav a:hover, nav a.active {
+    background-color: #e3e3f4;
+    color: #8080cc;
+}
+
+section {
+    background: white;
+    margin: 2rem auto;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+h2 {
+    color: #8080cc;
+    border-bottom: 3px solid #e3e3f4;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1.5rem;
+    font-size: 1.8rem;
+}
+
+h3 {
+    color: #8080cc;
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+ol, ul {
+    margin: 0 0 1rem 1.5rem;
+}
+
+li {
+    margin-bottom: 0.5rem;
+}
+
+code {
+    background: #f0f0f8;
+    padding: 0.15rem 0.4rem;
+    border-radius: 4px;
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 0.9em;
+    color: #5555aa;
+}
+
+pre {
+    background: #2d2d3a;
+    color: #e3e3f4;
+    padding: 1.25rem;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin-bottom: 1rem;
+}
+
+pre code {
+    background: none;
+    color: inherit;
+    padding: 0;
+    font-size: 0.9rem;
+}
+
+.btn {
+    display: inline-block;
+    background: #8080cc;
+    color: white;
+    padding: 0.9rem 2rem;
+    border-radius: 6px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background-color 0.2s;
+}
+
+.btn:hover {
+    background: #6a6ab8;
+    text-decoration: none;
+}
+
+.pipeline-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.pipeline-card {
+    display: block;
+    background: #f9f9fc;
+    border: 1px solid #e3e3f4;
+    border-radius: 8px;
+    padding: 1.25rem;
+    color: #333;
+    transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.pipeline-card:hover {
+    box-shadow: 0 4px 12px rgba(128,128,204,0.25);
+    transform: translateY(-2px);
+    text-decoration: none;
+}
+
+.pipeline-card .step-num {
+    display: inline-block;
+    background: #8080cc;
+    color: white;
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 1.75rem;
+    font-size: 0.85rem;
+    margin-bottom: 0.5rem;
+}
+
+.pipeline-card h3 {
+    margin-top: 0;
+    margin-bottom: 0.25rem;
+}
+
+.pipeline-card p {
+    margin-bottom: 0;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.status-badge {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.2rem 0.6rem;
+    border-radius: 12px;
+    background: #e3e3f4;
+    color: #6a6ab8;
+    margin-left: 0.5rem;
+    vertical-align: middle;
+}
+
+footer {
+    background-color: #8080cc;
+    color: white;
+    text-align: center;
+    padding: 1.5rem 0;
+    margin-top: 3rem;
+}
+
+footer p {
+    margin-bottom: 0.25rem;
+}
+
+@media (max-width: 768px) {
+    header h1 {
+        font-size: 2rem;
+    }
+
+    nav ul {
+        flex-direction: column;
+    }
+
+    nav a {
+        border-bottom: 1px solid #eee;
+    }
+}
