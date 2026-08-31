@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administrative Origins - Clean</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Administrative Origins</h1>
+            <p>A large-scale linked administrative dataset of the U.S. federal workforce</p>
+        </div>
+    </header>
+
+    <nav>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="individual.html">Individual</a></li>
+            <li><a href="organization.html">Organization</a></li>
+            <li><a href="occupation.html">Occupation</a></li>
+            <li><a href="clean.html" class="active">Clean</a></li>
+            <li><a href="civil-service-protections.html">Civil Service Protections</a></li>
+            <li><a href="census.html">Census</a></li>
+            <li><a href="legislation.html">Legislation</a></li>
+            <li><a href="oversight.html">Oversight</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <section>
+            <h2>Clean<span class="status-badge">In progress</span></h2>
+            <p>This step documents the general-purpose cleaning rules applied across the dataset: deduplication, outlier handling, missing-data treatment, and consistency checks that don't belong to a single upstream module.</p>
+        </section>
+
+        <section>
+            <h3>Steps</h3>
+            <ol>
+                <li>Deduplicate records within each period.</li>
+                <li>Standardize dates, salaries, and categorical fields.</li>
+                <li>Apply top/bottom-coding or trimming rules where relevant.</li>
+                <li>Run automated consistency checks and log flagged records.</li>
+            </ol>
+        </section>
+
+        <section>
+            <h3>Replication code</h3>
+            <p>The snippet below is a starting placeholder &mdash; replace it with the actual script(s) used for this step, or link out to a script file in this repository (e.g. <code>code/clean.py</code>).</p>
+            <pre><code># Placeholder: dataset-wide cleaning rules
+
+def clean_panel(df):
+    df = df.drop_duplicates(subset=['person_id', 'period'])
+    df['salary'] = df['salary'].clip(lower=0)
+    return df
+</code></pre>
+        </section>
+
+        <section>
+            <h3>Data &amp; downloads</h3>
+            <p>Add links here to any intermediate or output files associated with this step (e.g., crosswalks, lookup tables, or the cleaned output of this stage).</p>
+        </section>
+
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy; Administrative Origins Project</p>
+            <p>Last updated: [Month Year]</p>
+        </div>
+    </footer>
+</body>
+</html>
+
