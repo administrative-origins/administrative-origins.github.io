@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administrative Origins - Home</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Administrative Origins</h1>
+            <p>A large-scale linked administrative dataset of the U.S. federal workforce</p>
+        </div>
+    </header>
+
+    <nav>
+        <ul>
+            <li><a href="index.html" class="active">Home</a></li>
+            <li><a href="individual.html">Individual</a></li>
+            <li><a href="organization.html">Organization</a></li>
+            <li><a href="occupation.html">Occupation</a></li>
+            <li><a href="clean.html">Clean</a></li>
+            <li><a href="civil-service-protections.html">Civil Service Protections</a></li>
+            <li><a href="census.html">Census</a></li>
+            <li><a href="legislation.html">Legislation</a></li>
+            <li><a href="oversight.html">Oversight</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <section style="text-align:center;">
+            <h2 style="border-bottom:none; margin-bottom:0.75rem;">About this dataset</h2>
+            <p style="max-width:700px; margin:0 auto 1.5rem;">Administrative Origins is a large, linked administrative dataset built from federal personnel records. It tracks individuals, organizations, and occupations over time, alongside the civil service protections, legislative changes, and oversight actions that shape the federal workforce. Replace this paragraph with a full description of the dataset's scope, time coverage, and sources.</p>
+            <a class="btn" href="#" id="download-link">Download the Data</a>
+            <p style="margin-top:1rem; font-size:0.9rem; color:#777;">Replace the link above with your hosted data (e.g., Dataverse, Zenodo, or a release on this repository). Latest version: [v0.1] &middot; [Month Year]</p>
+        </section>
+
+        <section>
+            <h2>Construction Pipeline</h2>
+            <p>Each stage below documents the steps and code used to build this part of the dataset, so the full pipeline can be replicated end to end.</p>
+            <div class="pipeline-grid">
+            <a class="pipeline-card" href="individual.html">
+                <span class="step-num">1</span>
+                <h3>Individual</h3>
+                <p>Constructing and disambiguating individual-level employee records.</p>
+            </a>
+            <a class="pipeline-card" href="organization.html">
+                <span class="step-num">2</span>
+                <h3>Organization</h3>
+                <p>Mapping agency, sub-agency, and organizational hierarchy over time.</p>
+            </a>
+            <a class="pipeline-card" href="occupation.html">
+                <span class="step-num">3</span>
+                <h3>Occupation</h3>
+                <p>Classifying job series, occupational categories, and pay schedules.</p>
+            </a>
+            <a class="pipeline-card" href="clean.html">
+                <span class="step-num">4</span>
+                <h3>Clean</h3>
+                <p>General cleaning rules, deduplication, and quality checks applied dataset-wide.</p>
+            </a>
+            <a class="pipeline-card" href="civil-service-protections.html">
+                <span class="step-num">5</span>
+                <h3>Civil Service Protections</h3>
+                <p>Coding appointment types, competitive/excepted service status, and tenure protections.</p>
+            </a>
+            <a class="pipeline-card" href="census.html">
+                <span class="step-num">6</span>
+                <h3>Census</h3>
+                <p>Linking records to Census/geographic and demographic data.</p>
+            </a>
+            <a class="pipeline-card" href="legislation.html">
+                <span class="step-num">7</span>
+                <h3>Legislation</h3>
+                <p>Tracking relevant statutes, executive orders, and regulatory changes.</p>
+            </a>
+            <a class="pipeline-card" href="oversight.html">
+                <span class="step-num">8</span>
+                <h3>Oversight</h3>
+                <p>Documenting IG reports, GAO reviews, and other oversight records linked to the data.</p>
+            </a>
+            </div>
+        </section>
+
+        <section>
+            <h2>Citing this dataset</h2>
+            <p>If you use this dataset, please cite: [Author]. ([Year]). <em>Administrative Origins: [Full Title]</em>. Replace with full citation and, if applicable, a DOI.</p>
+        </section>
+
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy; Administrative Origins Project</p>
+            <p>Last updated: [Month Year]</p>
+        </div>
+    </footer>
+</body>
+</html>
+
