@@ -43,28 +43,20 @@
     <div class="container">
         <section>
             <h2>Clean<span class="status-badge">In progress</span></h2>
-            <p>This step documents the general-purpose cleaning rules applied across the dataset: deduplication, outlier handling, missing-data treatment, and consistency checks that don't belong to a single upstream module.</p>
+            <p>[Describe this step: what it does, what source files it uses, and any key methodological choices.]</p>
         </section>
 
         <section>
             <h3>Steps</h3>
             <ol>
-                <li>Deduplicate records within each period.</li>
-                <li>Standardize dates, salaries, and categorical fields.</li>
-                <li>Apply top/bottom-coding or trimming rules where relevant.</li>
-                <li>Run automated consistency checks and log flagged records.</li>
+                <li>[Add the steps for this stage.]</li>
             </ol>
         </section>
 
         <section>
             <h3>Replication code</h3>
             <p>The snippet below is a starting placeholder &mdash; replace it with the actual script(s) used for this step, or link out to a script file in this repository (e.g. <code>code/clean.py</code>).</p>
-            <pre><code># Placeholder: dataset-wide cleaning rules
-
-def clean_panel(df):
-    df = df.drop_duplicates(subset=['person_id', 'period'])
-    df['salary'] = df['salary'].clip(lower=0)
-    return df
+            <pre><code># Placeholder -- add replication code for this step.
 </code></pre>
         </section>
 
