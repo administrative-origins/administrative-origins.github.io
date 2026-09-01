@@ -43,28 +43,20 @@
     <div class="container">
         <section>
             <h2>Organization<span class="status-badge">In progress</span></h2>
-            <p>This step documents how organizational units (departments, agencies, sub-agencies, bureaus) are identified, standardized, and tracked through reorganizations, renamings, and mergers. Describe the crosswalks used to harmonize organization codes across years.</p>
+            <p>[Describe this step: what it does, what source files it uses, and any key methodological choices.]</p>
         </section>
 
         <section>
             <h3>Steps</h3>
             <ol>
-                <li>Extract raw organizational codes from source files.</li>
-                <li>Build a crosswalk to harmonize codes across reorganizations.</li>
-                <li>Assign a consistent organization hierarchy (department > agency > sub-agency).</li>
-                <li>Flag known mergers, splits, and renamings.</li>
+                <li>[Add the steps for this stage.]</li>
             </ol>
         </section>
 
         <section>
             <h3>Replication code</h3>
             <p>The snippet below is a starting placeholder &mdash; replace it with the actual script(s) used for this step, or link out to a script file in this repository (e.g. <code>code/organization.py</code>).</p>
-            <pre><code># Placeholder: organization crosswalk construction
-
-def harmonize_org_codes(df, crosswalk_path):
-    crosswalk = pd.read_csv(crosswalk_path)
-    df = df.merge(crosswalk, on='raw_org_code', how='left')
-    return df
+            <pre><code># Placeholder -- add replication code for this step.
 </code></pre>
         </section>
 
