@@ -43,30 +43,20 @@
     <div class="container">
         <section>
             <h2>Occupation<span class="status-badge">In progress</span></h2>
-            <p>This step covers how occupational series (e.g., OPM job series codes), pay plans, and grade/step information are cleaned and classified. Describe any crosswalks to standardized occupation taxonomies (e.g., SOC codes) if used.</p>
+            <p>[Describe this step: what it does, what source files it uses, and any key methodological choices.]</p>
         </section>
 
         <section>
             <h3>Steps</h3>
             <ol>
-                <li>Extract raw occupational series and pay plan codes.</li>
-                <li>Classify series into broader occupational categories.</li>
-                <li>Crosswalk to an external occupation taxonomy, if applicable.</li>
-                <li>Handle missing or recoded series over time.</li>
+                <li>[Add the steps for this stage.]</li>
             </ol>
         </section>
 
         <section>
             <h3>Replication code</h3>
             <p>The snippet below is a starting placeholder &mdash; replace it with the actual script(s) used for this step, or link out to a script file in this repository (e.g. <code>code/occupation.py</code>).</p>
-            <pre><code># Placeholder: occupation classification
-
-library(dplyr)
-
-classify_occupation <- function(df, series_map) {
-  df %>%
-    left_join(series_map, by = "occ_series")
-}
+            <pre><code># Placeholder -- add replication code for this step.
 </code></pre>
         </section>
 
