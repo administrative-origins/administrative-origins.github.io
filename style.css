@@ -381,3 +381,28 @@ footer p {
     color: #777;
     margin-top: 0.4rem;
 }
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.25rem 0;
+    font-size: 0.9rem;
+}
+
+.data-table caption {
+    text-align: left;
+    font-weight: 600;
+    color: #555;
+    margin-bottom: 0.4rem;
+}
+
+.data-table th, .data-table td {
+    padding: 0.4rem 0.6rem;
+    border-bottom: 1px solid #e6e5e1;
+    text-align: left;
+}
+
+.data-table th {
+    background: #e3e3f4;
+    color: #6a6ab8;
+}
