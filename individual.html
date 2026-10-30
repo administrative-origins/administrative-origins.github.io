@@ -61,7 +61,7 @@
 
                 <li><strong>Generate empty crosswalks</strong> The registers abbreviate and spell the same thing in many ways, so the raw <code>position</code>, <code>cong_district</code> and the three state fields (<code>state_born</code>, <code>state_appointed</code>, <code>state_employed</code>) are turned into crosswalks: one row per unique raw string, most frequent first, with an empty <code>_clean</code> column. Positions are only abbreviated in 1907&ndash;1921, so that crosswalk has one row per term <em>and year</em>; the three state fields share one crosswalk.</li>
 
-                <li><strong>Fill crosswalks from hand codings</strong> Earlier hand-coded lists of titles, birthplaces and appointing states pre-fill whatever they already resolve. Only blank cells are filled, so nothing already entered is overwritten, and conflicting hand codings are reported.</li>
+                <li><strong>Fill crosswalks from hand codings</strong> Many of the abbreviated and otherwise unstandardized entries were decoded by Kevin Angell. His entries, which cover all of the most common position titles and locations, are added to the empty crosswalks.</li>
 
                 <li><strong>Test Claude crosswalk generation</strong> Before using Claude to fill the remaining entries, we test it against human coders. The script draws random samples of still-unfilled entries (50 states, 50 districts, 150 positions), reads back each coder&rsquo;s filled sample, and computes inter-coder agreement (pairwise agreement, Cohen&rsquo;s &kappa;, and Krippendorff&rsquo;s &alpha;). Disagreements are hand-marked as substantive or trivial, and agreement is reported both ways.</li>
 
