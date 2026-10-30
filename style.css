@@ -357,3 +357,27 @@ footer p {
         padding-left: 2.5rem;
     }
 }
+
+.figure-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+    gap: 1.5rem;
+    margin: 1rem 0;
+}
+
+.figure-grid figure {
+    margin: 0;
+}
+
+.figure-grid img {
+    width: 100%;
+    height: auto;
+    border: 1px solid #e6e5e1;
+    border-radius: 6px;
+}
+
+.figure-grid figcaption {
+    font-size: 0.85rem;
+    color: #777;
+    margin-top: 0.4rem;
+}

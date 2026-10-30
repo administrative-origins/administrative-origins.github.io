@@ -1,0 +1,61 @@
+Model: Claude Sonnet 5.5 Medium
+Beginning 10/28/2026
+
+___________________________________
+
+Please fill the spreadsheets in C:\Users\Lucas\Box\Administrative Origins\Data Generation\1. Individual\Input\b. Disambiguation Crosswalks. 
+
+You may use information from C:\Users\Lucas\Box\Administrative Origins\Data Generation\1. Individual\Input\c. Abbreviations or search the web. Your goal is to match expert human coders. If you are uncertain about a response, please leave it blank. There are Congressional districts (50), which should output to 
+
+a number (5th --> 5),
+a pair of numbers (5-10th --> 5 or 10),
+a transcription of another category (Navy Yard, DC, At Large)
+or left blank if unclear
+
+Abbreviated positions (150) which should output 
+
+the role in as much detail as possible (AsstClrk&Illstr --> Assistant Clerk and Illustrator),
+Or left blank if unclear
+
+Locations (50) which should output
+
+A US State, spelled out instead of abbreviated (Illinois),
+territory (Puerto Rico),
+a foreign nation (Mexico),
+Some other descriptor (At Large),
+Or left blank if unclear
+ 
+Please process each individually, not in batches. When deploying subagents, insist on using the dictionary lookup for any uncertain terms, and flag especially uncertain ones for later human parsing. Accuracy here is important. Do you have any questions before beginning?
+
+
+___________________________________
+
+I have questions before I start, because the full crosswalks are a much bigger job than the 250-item samples.
+
+Blank entries in b. Disambiguation Crosswalks:
+
+crosswalk_position.csv: 49,774 blank of 56,909 rows
+crosswalk_state.csv: 1,652 blank of 2,880 rows
+crosswalk_cong_district.csv: 43 blank of 334 rows (41 blank in the coarse column)
+“Process each individually” at that scale is about 51,000 items. Done as one subagent per item, that would cost an enormous number of tokens. Even done in a single pass it would be very large, and the position file is 2.9 MB. Most of the position entries have tiny counts (n).
+
+Scope: Which entries should I fill?
+Everything: all ~51,000 blanks. I’d run it as many background workers, each given a fixed chunk of rows and told to treat every row separately.
+By frequency: only entries above an n threshold, or enough of the most frequent ones to cover a set share of the rows in the registers. I’d need you to name the cutoff.
+Districts and states first: the ~1,700 district and state entries first, then positions later.
+Existing answers: I’ll fill only blank *_clean cells and leave your existing answers alone. Is that right? The sample items were drawn from these blanks, so the Claude sample coding already covers some of them.
+Coarse column: Should I also fill cong_district_clean_coarse? The state file has no coarse column. The coarse values are the district number(s), “At Large” or “Other”.
+Context columns: Positions have year, department_context and office_context. May I use those to decide the role, or should I code from the abbreviation alone, as the samples showed?
+Output format: I’d write to the same file with a backup copy first, and leave uncertain entries blank as you asked. Or should the filled versions go in a separate file so your crosswalks stay untouched until you’ve reviewed them?
+
+__________________________________
+
+1) Start with districts and states, but do all positions after. Batch as necessary to preserve focus and avoid losing progress. 
+2) correct, leave existing answers alone
+3) Yes
+4) Yes, use context as necessary. If at all uncertain, refer to the PDFs with de-abbreviations available in Input/c. Abbreviations
+5) the former
+
+
+_________________________________
+Instructions to subagent: Follow C:\Users\Lucas\AppData\Local\Temp\claude\C--Users-Lucas-Dropbox-bureaucracy--1817-1959-code-occupation-classification\7d53ab56-0c86-431d-9c5a-7f1fe29a9848\scratchpad\pos_review_hi_addendum.md (it points you to pos_review_instructions.md, which you must also read in full). NNN = 010: input review_hi010.csv, outputs rev_hi010.csv and revlog_hi010.txt in pos_review_hi_out. Every source and every output is mandatory; check every row individually. Confidence standard (use this exactly): HIGH only if every component is printed in the SAME-YEAR list(s) of the title's register years, or the title is a whole printed entry or only full words; MEDIUM if any component is missing from a title year's list or the lists differ across the title's years. Dictionary dash entries (meaning starting with an em-dash) are mechanical guesses: open the page image to resolve any ditto your decision depends on. Inserted words: do NOT add or keep 'of', 'in', 'on' or 'to' unless the printed list itself prints it as part of that entry. Write revlog_hi010.txt before your final step. Put helpers in SP\work_hi010\ and do not touch other agents' files.
