@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+(<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -57,7 +57,7 @@
             <ol>
                 <li><strong>Bind all registers</strong> Reads the 73 yearly Official Register spreadsheets (1817&ndash;1959), standardizes their column headers across the three header eras, and binds them into one file. Exact repeats, and rows that differ only in where the person worked, are collapsed into one row, with <code>n_collapsed</code> recording how many original rows each stands for. Output: <code>all_registers_1817_1959.csv</code>.</li>
 
-                <li><strong>Generate empty crosswalks</strong> The registers abbreviate and spell the same thing in many ways, so the raw <code>position</code>, <code>cong_district</code> and the three state fields (<code>state_born</code>, <code>state_appointed</code>, <code>state_employed</code>) are turned into crosswalks: one row per unique raw string, most frequent first, with an empty <code>_clean</code> column. Positions are only abbreviated in 1907&ndash;1921, so that crosswalk has one row per term <em>and year</em>; the three state fields share one crosswalk. A fifth crosswalk maps <code>city_employed</code> to a work state for rows that list a city but no state (for example 6,575 rows in 1865). Each city carries context columns (departments, offices, and the states people there were appointed from or born in) to help resolve ambiguous names such as Springfield or Portland. Filled crosswalks are saved as separate <code>_filled.csv</code> files, and regenerating the blank ones never overwrites them.</li>
+                <li><strong>Generate empty crosswalks</strong> The registers abbreviate and spell the same thing in many ways, so the raw <code>position</code>, <code>cong_district</code> and the three state fields (<code>state_born</code>, <code>state_appointed</code>, <code>state_employed</code>) are turned into crosswalks: one row per unique raw string, most frequent first, with an empty <code>_clean</code> column. Positions are only abbreviated in 1907&ndash;1921, so that crosswalk has one row per term <em>and year</em>; the three state fields share one crosswalk. A fifth crosswalk maps <code>city_employed</code> to a work state for rows that list a city but no state. Each crosswalk carries context columns (departments, offices, and the states people there were appointed from or born in) to help resolve ambiguities. Filled crosswalks are saved as separate <code>_filled.csv</code> files.</li>
 
                 <li><strong>Fill crosswalks from hand codings</strong> Many of the abbreviated and otherwise unstandardized entries were decoded by Kevin Angell. His entries, which cover all of the most common position titles and locations, are added to the empty crosswalks.</li>
 
