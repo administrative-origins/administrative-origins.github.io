@@ -406,3 +406,15 @@ footer p {
     background: #e3e3f4;
     color: #6a6ab8;
 }
+
+/* Descriptive-plot subsections */
+h4 {
+    color: #4a4a9c;
+    font-size: 1.35rem;
+    margin: 2.5rem 0 1rem;
+    padding: 0.4rem 0.8rem;
+    background: #f0f0fa;
+    border-left: 5px solid #8080cc;
+    border-radius: 0 4px 4px 0;
+}
+
