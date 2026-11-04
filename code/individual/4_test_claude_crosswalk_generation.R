@@ -29,10 +29,20 @@ table_dir     <- file.path(base_dir, "Output", "Tables")
 walk(c(sample_dir, coded_dir, figure_dir, table_dir), dir.create, showWarnings = FALSE, recursive = TRUE)
 
 #Sample sizes by crosswalk (crosswalk name -> number of entries drawn)
-sample_sizes <- c(state = 50, cong_district = 50, position = 150)
+#state_from_city_emp is the city -> work state crosswalk (crosswalk_state_from_city_emp.csv): the coders see a city_employed and fill in its state_employed_clean
+sample_sizes <- c(state = 50, cong_district = 50, position = 150, state_from_city_emp = 50)
+#Crosswalk file and raw-term column behind each field (a field's cleaned column is always <field>_clean)
+#The city crosswalk is read from crosswalk_state_from_city_emp.csv (all years, filled cities carried over by script 2) rather than a _filled file, which only has the 1817-1905 cities.
+crosswalk_files <- c(state = "crosswalk_state_filled.csv", cong_district = "crosswalk_cong_district_filled.csv",
+                     position = "crosswalk_position_filled.csv", state_from_city_emp = "crosswalk_state_from_city_emp.csv")
+term_cols <- c(state = "state", cong_district = "cong_district", position = "position", state_from_city_emp = "city_employed")
+#Cleaned column behind each field. The city crosswalk fills the work state, so its cleaned column is state_employed_clean.
+clean_cols <- c(state = "state_clean", cong_district = "cong_district_clean", position = "position_clean", state_from_city_emp = "state_employed_clean")
 #Context columns shown to coders, by crosswalk (other columns are hidden)
 #Position entries are term-year pairs (script 2), so the year is shown for positions
-context_cols <- list(state = "n", cong_district = "n", position = c("year", "n", "department_context", "office_context"))
+#City entries show where the people listed under the city were appointed from / born / employed, to help with ambiguous names (Springfield...)
+context_cols <- list(state = "n", cong_district = "n", position = c("year", "n", "department_context", "office_context"),
+                     state_from_city_emp = c("n", "first_year", "last_year", "state_appointed_context", "state_born_context", "department_context", "office_context"))
 
 #Coders whose files are LLMs; everything else is treated as a human coder (names are the <coder> part of the filename)
 llm_coders <- c("claude")
@@ -43,7 +53,7 @@ set.seed(20261016)
 
 
 ####GENERATE RANDOM SAMPLES####
-#Draw uniformly at random from the entries (term-years for positions) whose cleaned value is still blank
+#Draw uniformly at random from the entries (term-years for positions) whose cleaned value is still blank (entries already filled are never sampled)
 draw_sample <- function(field) {
   out_path <- file.path(sample_dir, str_c("sample_", field, ".csv"))
   if (file.exists(out_path) && !redraw_samples) {
@@ -51,8 +61,8 @@ draw_sample <- function(field) {
     return(invisible(NULL))
   }
 
-  clean_col <- str_c(field, "_clean")
-  crosswalk <- read_csv(file.path(crosswalk_dir, str_c("crosswalk_", field, ".csv")),
+  clean_col <- clean_cols[[field]]
+  crosswalk <- read_csv(file.path(crosswalk_dir, crosswalk_files[[field]]),
                         col_types = cols(.default = col_character()), na = character(), show_col_types = FALSE)
   unfilled <- crosswalk %>% filter(.data[[clean_col]] == "")
   if (nrow(unfilled) < sample_sizes[[field]]) stop(field, ": only ", nrow(unfilled), " unfilled entries, fewer than the sample size")
@@ -60,7 +70,7 @@ draw_sample <- function(field) {
   drawn <- unfilled %>%
     slice_sample(n = sample_sizes[[field]]) %>%
     mutate(sample_id = str_c(field, "_", str_pad(row_number(), 3, pad = "0"))) %>%
-    select(sample_id, all_of(c(field, context_cols[[field]], clean_col)))
+    select(sample_id, all_of(c(term_cols[[field]], context_cols[[field]], clean_col)))
 
   write_csv(drawn, out_path, na = "")
   message(field, ": drew ", nrow(drawn), " of ", nrow(unfilled), " unfilled entries -> ", out_path)
@@ -72,7 +82,7 @@ walk(names(sample_sizes), draw_sample)
 ####READ FILLED SAMPLES####
 #Each coder has a folder in coded_dir named "Coder <k> (<name>)" (e.g. "Coder 3 (Claude)") holding one file per field, named
 #sample_<field>[_<suffix>].csv (e.g. sample_position_C.csv). The coder is the name in parentheses; files keep sample_id and <field>_clean.
-file_pattern <- str_c("^sample_(", str_c(names(sample_sizes), collapse = "|"), ")(_.*)?\\.csv$")
+file_pattern <- str_c("^sample_(", str_c(names(sample_sizes)[order(-nchar(names(sample_sizes)))], collapse = "|"), ")(_.*)?\\.csv$")
 coded_files <- list.files(coded_dir, pattern = file_pattern, full.names = TRUE, recursive = TRUE)
 if (length(coded_files) == 0) {
   stop("No coded samples found in ", coded_dir, " yet. Add the filled files (<coder folder>/sample_<field>.csv) and rerun for the reliability analysis.")
@@ -89,7 +99,7 @@ coded <- map_dfr(coded_files, function(path) {
   file_has_coarse <- str_c(field, "_clean_coarse") %in% names(x)
   x %>%
     transmute(field = field, coder = coder, sample_id, has_coarse = file_has_coarse,
-              response = na_if(str_squish(.data[[str_c(field, "_clean")]]), ""),
+              response = na_if(str_squish(.data[[clean_cols[[field]]]]), ""),
               #state and cong_district files may also carry a coarse column (<field>_clean_coarse): the district number(s) /
               #"At Large" / "Other", or the state, territory or nation / "Other". Coders without one are left NA at that level.
               response_coarse = if (file_has_coarse) na_if(str_squish(.data[[str_c(field, "_clean_coarse")]]), "") else NA_character_)
@@ -106,7 +116,7 @@ coded <- bind_rows(mutate(coded, level = "detailed"),
 terms <- map_dfr(names(sample_sizes), function(field) {
   read_csv(file.path(sample_dir, str_c("sample_", field, ".csv")), col_types = cols(.default = col_character()),
            na = character(), show_col_types = FALSE) %>%
-    transmute(field = field, sample_id, term = .data[[field]], year = if ("year" %in% names(.)) year else NA_character_)
+    transmute(field = field, sample_id, term = .data[[term_cols[[field]]]], year = if ("year" %in% names(.)) year else NA_character_)
 })
 stopifnot(!any(duplicated(coded[c("field", "level", "coder", "sample_id")])))
 coded <- coded %>% left_join(terms, by = c("field", "sample_id"))

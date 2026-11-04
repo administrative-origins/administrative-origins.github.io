@@ -38,10 +38,10 @@ registers <- read_csv(register_path, col_types = cols(.default = col_character()
 #Read a crosswalk as a named lookup: raw term -> cleaned value; for by_year crosswalks (position) raw term + year -> cleaned value,
 #since the same abbreviation can mean different things in different years. Blank cleaned cells (not yet filled) become NA.
 read_lookup <- function(name, by_year = FALSE) {
-  cw <- read_csv(file.path(crosswalk_dir, str_c("crosswalk_", name, ".csv")),
+  cw <- read_csv(file.path(crosswalk_dir, str_c("crosswalk_", name, "_filled.csv")),
                  col_types = cols(.default = col_character()), na = character(), show_col_types = FALSE)
   keys <- if (by_year) c(name, "year") else name
-  if (anyDuplicated(cw[keys])) stop("crosswalk_", name, ".csv has duplicated raw terms", if (by_year) " within a year")
+  if (anyDuplicated(cw[keys])) stop("crosswalk_", name, "_filled.csv has duplicated raw terms", if (by_year) " within a year")
   set_names(na_if(cw[[str_c(name, "_clean")]], ""), if (by_year) str_c(cw[[name]], "|", cw$year) else cw[[name]])
 }
 apply_lookup <- function(raw, lookup, year = NULL) unname(lookup[if (is.null(year)) raw else str_c(raw, "|", year)])  #NA raw (or a term missing from the crosswalk) -> NA
@@ -84,6 +84,32 @@ registers <- registers %>%
          state_appointed_clean = apply_lookup(state_appointed_for_lookup, state_lookup),
          state_employed_clean  = apply_lookup(state_employed,  state_lookup),
          cong_district_clean   = apply_lookup(cong_district,   read_lookup("cong_district")))
+
+#FILL: WORK STATE FROM CITY
+#WHAT: for rows with a city_employed but no raw state_employed, state_employed_clean is filled from the hand-filled city crosswalk
+#      (crosswalk_state_from_city_emp_filled.csv, built by script 2). Rows that already have a state are not touched; cities left blank in the crosswalk stay missing.
+#WHY:  many registers list a city but no state (e.g. 1865: 6,575 rows; 1907-1921: 30-70% of rows, because the compact registers print a state only
+#      where the place name needs it).
+#HOW:  state_employed_from_city flags every row filled this way. The raw columns are left as transcribed.
+#      The hand fill has a few spellings that are not in the state crosswalk's vocabulary; they are corrected here (city_fixes) so the cleaned column stays consistent.
+city_years <- 1817:1959   #must match script 2
+city_fixes <- c("Phillipines" = "Philippine Islands", "Kanas" = "Kansas", "Inidana" = "Indiana")
+city_cw <- read_csv(file.path(crosswalk_dir, "crosswalk_state_from_city_emp_filled.csv"), col_types = cols(.default = col_character()), na = character(), show_col_types = FALSE)
+if (anyDuplicated(city_cw$city_employed)) stop("crosswalk_state_from_city_emp_filled.csv has duplicated cities")
+city_cw <- city_cw %>%
+  mutate(state_employed_clean = na_if(str_squish(state_employed_clean), ""),
+         state_employed_clean = coalesce(unname(city_fixes[state_employed_clean]), state_employed_clean),
+         state_employed_clean = if_else(city_employed == "Pittsburg", "Pennsylvania", state_employed_clean))   #hand fill had Philadelphia, clearly a slip
+city_lookup <- set_names(city_cw$state_employed_clean, city_cw$city_employed)
+unknown_states <- setdiff(na.omit(unique(city_lookup)), na.omit(unique(state_lookup)))
+if (length(unknown_states) > 0) { message("City crosswalk values not in the state crosswalk vocabulary:"); print(unknown_states) }
+registers <- registers %>%
+  mutate(state_employed_from_city = year %in% city_years & is.na(state_employed) & !is.na(city_employed) & !is.na(unname(city_lookup[city_employed])),
+         state_employed_clean     = if_else(state_employed_from_city, unname(city_lookup[city_employed]), state_employed_clean))
+city_fill_by_year <- registers %>% filter(year %in% city_years) %>%
+  group_by(year) %>% summarise(n_rows = n(), rows_filled = sum(state_employed_from_city), .groups = "drop") %>% filter(rows_filled > 0)
+print(city_fill_by_year, n = Inf)
+write_csv(city_fill_by_year, file.path(table_dir, "state_employed_from_city_by_year.csv"))
 
 #1881-1891 registers have no congressional district column. The numbers captured in cong_district for those years are the section headings of
 #the Treasury field services (Internal Revenue collection districts, light-house districts, etc.), not congressional districts, so the cleaned

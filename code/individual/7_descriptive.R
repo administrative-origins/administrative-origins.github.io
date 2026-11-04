@@ -1,7 +1,7 @@
 #--------------------
 #Author: Lucas Cain
 #Date Created: 9/30/2026
-#Date Last Modified: 10/28/2026
+#Date Last Modified: 11/03/2026
 #Purpose: Here we tabulate and plot some descriptive statistics
 #--------------------
 
@@ -64,6 +64,7 @@ x_breaks       <- seq(1820, 1960, by = 20)
 register_colors <- c("#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4", "#008300", "#6250d6", "#e34948")
 neutral_colour  <- "#d4d2cb"   #light grey: "missing" / "no amount"
 other_colour    <- "#8c8a82"   #darker grey: "other"
+footnote_colour <- "#c8b58a"   #tan: pay given only as a footnote reference
 
 theme_register <- function(size = base_size) {
   theme_minimal(base_size = size, base_family = plot_font) +
@@ -97,7 +98,7 @@ save_table <- function(df, name) write_csv(df, file.path(table_dir, str_c(name, 
 
 ####READ DATA####
 registers <- read_csv(register_path, col_types = cols(.default = col_character()),
-                      col_select = c(year, state_born_clean, state_appointed_clean, state_employed_clean, cong_district, cong_district_clean, position_clean,
+                      col_select = c(year, department, state_born_clean, state_appointed_clean, state_employed_clean, cong_district, cong_district_clean, position_clean,
                                      compensation, yearly_compensation_inferred, yearly_compensation_source)) %>%
   mutate(year = as.integer(year),
          yearly_compensation_inferred = as.numeric(yearly_compensation_inferred))
@@ -254,14 +255,20 @@ anim_save(file.path(figure_dir, "state_born_heatmap.gif"), birth_anim)
 #Proportion with yearly salary, piecework, daily, weekly, monthly
 #Classify the pay as written (rate type), independent of whether a yearly figure could be computed
 pay_type_levels <- c("Yearly", "Weekly/monthly", "Daily", "Hourly", "Piecework", "Fees/commission", "Pay of rank/grade",
-                     "Other", "No amount")
-classify_pay <- function(x) {
+                     "Other", "See footnote", "No amount")
+#Military ranks listed without a figure in the early registers: pay is implied by rank
+#(a rank word anywhere in the title; plain "general" is left out so Attorney General, Consul General etc. stay as they are)
+military_rank_pattern <- "captain|lieutenant|major|ensign|commander|colonel|brigadier|admiral|commodore|midshipm[ae]n|chaplain"
+classify_pay <- function(x, position = NA_character_, year = NA_integer_) {
   s <- x %>%
     str_to_lower() %>%
     str_replace_all(c("½" = "", "¼" = "", "¾" = "", "⅓" = "", "⅔" = "", "⅛" = "")) %>%  #drop fraction signs
     str_remove_all("[[:space:]$,]")
-  case_when(is.na(x) | s %in% c("", "_", "none")                    ~ "No amount",
-            str_detect(s, "^[(][^)]*[)]$")                          ~ "No amount",         #footnote marks like (1), (*)
+  blank <- is.na(x) | s %in% c("", "_", "none")
+  military_blank <- blank & year < 1907 & str_detect(str_to_lower(str_squish(position)), military_rank_pattern) %in% TRUE
+  case_when(military_blank                                          ~ "Pay of rank/grade", #no figure printed; pay set by rank
+            blank                                                   ~ "No amount",
+            str_detect(s, "^[(][^)]*[)]$")                          ~ "See footnote",      #footnote marks like (1), (*): amount is in the footnote
             str_detect(s, "piece|pcwrk|pcwk")                       ~ "Piecework",
             str_detect(s, "perhour|[0-9]ph|cph")                    ~ "Hourly",
             str_detect(s, "perday|perdiem|[0-9]pd|cpd|p[.]d|^pd$")  ~ "Daily",
@@ -272,7 +279,7 @@ classify_pay <- function(x) {
             TRUE                                                    ~ "Other")  #per observation, honorary, several amounts, ...
 }
 pay_types <- registers %>%
-  mutate(pay_type = factor(classify_pay(compensation), levels = pay_type_levels)) %>%
+  mutate(pay_type = factor(classify_pay(compensation, position_clean, year), levels = pay_type_levels)) %>%
   count(year, pay_type) %>%
   group_by(year) %>%
   mutate(share = n / sum(n)) %>%
@@ -281,7 +288,7 @@ p_pay_types <- ggplot(pay_types, aes(year, share, fill = pay_type)) +
   geom_col(width = 1, colour = surface_colour, linewidth = 0.2) +
   scale_x_year() +
   scale_y_continuous(labels = label_percent(), expand = c(0, 0)) +
-  scale_fill_manual(values = c(register_colors[1:7], other_colour, neutral_colour)) +
+  scale_fill_manual(values = c(register_colors[1:7], other_colour, footnote_colour, neutral_colour)) +
   labs(title = "How employees were paid", subtitle = "Pay basis as written in the register", x = NULL, y = "Share of employees")
 save_plot(p_pay_types, "pay_type_by_year")
 save_table(pay_types, "pay_type_by_year")
@@ -538,3 +545,83 @@ p_employed <- ggplot(employed, aes(year, share, fill = place)) +
        caption = str_c("Work state is only recorded through 1921. ", caption_crosswalk))
 save_plot(p_employed, "employed_dc_vs_elsewhere")
 save_table(employed, "employed_dc_vs_elsewhere")
+
+  ##DC V. Not, excluding War and Navy
+#War and Navy employ large field forces (arsenals, navy yards, Army and Navy officers) that are mostly outside DC, and some War rows have no recorded
+#work state in some years (e.g. 1865). This repeats the chart above without them.
+#The department field is raw text, so War and Navy are matched by pattern: spelling variants, the 1907-1921 abbreviations (War, USA, USN, USMCorps)
+#and the 1905 field-force labels (e.g. "Quartermaster's Department at Large, Philippine Division").
+#Not counted as War or Navy: the State, War and Navy Building superintendent's staff and the WWI boards (War Trade Board, War Finance Corporation).
+shared_or_wartime_boards <- "state,? war,? (and|&) nav|sw&n|state ?war ?& ?nav|superintendent of state|^war ?(trade|finance|fin ?corp|industries|labor|risk)"
+war_departments          <- "^war|department of (the )?war|army|^usa$|^quarter ?master'?s? department|^subsistence department|^engineer department|^ordnance department"
+navy_departments         <- "^nav|navy|^usn$|usmcorps|marine corps"
+is_war_or_navy <- function(x) {
+  !is.na(x) & !str_detect(x, regex(shared_or_wartime_boards, ignore_case = TRUE)) &
+    (str_detect(x, regex(war_departments, ignore_case = TRUE)) | str_detect(x, regex(navy_departments, ignore_case = TRUE)))
+}
+employed_excl_war_navy <- registers %>%
+  filter(!is_war_or_navy(department), !is.na(classify_place(state_employed_clean))) %>%
+  mutate(place = if_else(state_employed_clean %in% dc_values, "Washington, DC", "Elsewhere")) %>%
+  count(year, place) %>%
+  group_by(year) %>%
+  mutate(share = n / sum(n)) %>%
+  ungroup() %>%
+  mutate(place = factor(place, levels = c("Washington, DC", "Elsewhere")))
+p_employed_excl_war_navy <- ggplot(employed_excl_war_navy, aes(year, share, fill = place)) +
+  geom_col(width = 1, colour = surface_colour, linewidth = 0.2) +
+  scale_x_year() +
+  scale_y_continuous(labels = label_percent(), expand = c(0, 0)) +
+  scale_fill_manual(values = register_colors[c(1, 2)]) +
+  labs(title = "Where employees worked: Washington, DC vs. elsewhere, excluding War and Navy", x = NULL,
+       y = "Share of employees with a recorded work state",
+       caption = str_c("Work state is only recorded through 1921. War and Navy are matched by department name (see script).
+", caption_crosswalk))
+save_plot(p_employed_excl_war_navy, "employed_dc_vs_elsewhere_excl_war_navy")
+save_table(employed_excl_war_navy, "employed_dc_vs_elsewhere_excl_war_navy")
+
+  ##Heatmap
+#Animated map: share of employees (with a recorded work place) working in each of the 48 states, by register year. Built like the birthplace heatmap above.
+#Same universe as the DC chart: rows whose work place is blank or not a place (Field, At Sea, ...) are dropped. DC and "Other" are dots off the Atlantic coast;
+#"Other" is everything that is not one of the 48 states or DC: foreign countries, territories and possessions, Alaska and Hawaii, etc.
+#Shares are of all employees with a recorded work place, so DC's large share leaves the state colours lighter in DC-heavy years.
+employed_map_share <- registers %>%
+  filter(!is.na(classify_place(state_employed_clean))) %>%
+  mutate(place = case_when(state_employed_clean %in% states_48 ~ state_employed_clean,
+                           state_employed_clean %in% c(dc_names, dc_values) ~ "DC",
+                           TRUE                                ~ "Other")) %>%
+  count(year, place, name = "n") %>%
+  complete(year, place = c(states_48, "DC", "Other"), fill = list(n = 0L)) %>%
+  group_by(year) %>%
+  mutate(share = n / sum(n)) %>%
+  ungroup()
+save_table(employed_map_share, "state_employed_share_by_year")
+
+employed_map_polygons <- map_data("state") %>%
+  filter(region != "district of columbia") %>%
+  mutate(place = str_to_title(region)) %>%
+  inner_join(filter(employed_map_share, place %in% states_48), by = "place", relationship = "many-to-many")
+
+employed_dots <- employed_map_share %>%
+  filter(place %in% c("DC", "Other")) %>%
+  mutate(lon = -70, lat = if_else(place == "DC", 36.5, 32.5),
+         label = str_c(place, " ", percent(share, accuracy = 0.1)))
+
+#Colour scale tops out at the 99th percentile of the state shares so one big state does not wash out the rest
+employed_share_cap <- quantile(filter(employed_map_share, place %in% states_48)$share, 0.99)
+p_employed_map <- ggplot() +
+  geom_polygon(data = employed_map_polygons, aes(long, lat, group = group, fill = share), colour = surface_colour, linewidth = 0.2) +
+  geom_point(data = employed_dots, aes(lon, lat, fill = share, size = share), shape = 21, colour = ink_secondary, stroke = 0.6) +
+  geom_text(data = employed_dots, aes(lon + 1.8, lat, label = label), hjust = 0, size = 3.4, colour = ink_secondary) +
+  scale_fill_gradient(low = "#fff5eb", high = register_colors[2], limits = c(0, employed_share_cap), oob = squish,
+                      labels = label_percent(), name = "Share employed") +
+  scale_size_area(max_size = 14, limits = c(0, max(employed_dots$share)), guide = "none") +
+  coord_map("albers", lat0 = 29.5, lat1 = 45.5, xlim = c(-125, -58)) +
+  labs(title = "Where employees worked: {current_frame}",
+       subtitle = "Share of employees with a recorded work place, by state (DC and Other shown as dots)",
+       caption = str_wrap(str_c("Dot size and colour = share. Other = foreign countries, territories, Alaska/Hawaii, etc. Work state is only recorded through 1921. ", caption_crosswalk), 130)) +
+  theme(axis.text = element_blank(), axis.title = element_blank(), panel.grid.major = element_blank(),
+        legend.key.width = unit(1.6, "cm"), legend.title = element_text(colour = ink_secondary)) +
+  transition_manual(year)
+employed_anim <- animate(p_employed_map, nframes = n_distinct(employed_map_polygons$year), fps = 4, width = 1000, height = 650, res = 110,
+                         renderer = gifski_renderer())
+anim_save(file.path(figure_dir, "state_employed_heatmap.gif"), employed_anim)

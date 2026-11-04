@@ -64,7 +64,10 @@ states <- check_conflicts(states, "states")
 ####FILL CROSSWALKS####
 #Only blank cleaned cells are filled, so anything already filled in a crosswalk is never overwritten
 fill_crosswalk <- function(name, lookup) {
-  path <- file.path(crosswalk_dir, str_c("crosswalk_", name, ".csv"))
+  #Filled crosswalks live in crosswalk_<name>_filled.csv so that regenerating the blank ones (script 2) never overwrites them.
+  #If no filled version exists yet, it is started from the blank crosswalk.
+  path <- file.path(crosswalk_dir, str_c("crosswalk_", name, "_filled.csv"))
+  if (!file.exists(path)) file.copy(file.path(crosswalk_dir, str_c("crosswalk_", name, ".csv")), path)
   clean_col <- str_c(name, "_clean")
   crosswalk <- read_csv(path, col_types = cols(.default = col_character()), na = character(), show_col_types = FALSE)
 

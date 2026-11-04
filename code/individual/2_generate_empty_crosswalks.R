@@ -96,3 +96,67 @@ state_terms <- registers %>%
   pivot_longer(everything(), values_to = "term") %>%
   select(term)
 write_crosswalk(state_terms, "state")
+
+
+####CITY -> STATE CROSSWALK####
+#Many rows have a city_employed but no state_employed (e.g. 6,575 rows in 1865, when the register lists city but has no state column). This crosswalk
+#lets the state be filled in from the city. Only rows with a city and a blank raw state_employed are included; rows that already have a state are not touched.
+#Some city names are ambiguous without more information (Springfield, Columbia, Portland...), so each city carries context columns showing what
+#else is known about the people listed under it: the departments/offices they work in and the states they were appointed from / born in.
+#Fill state_employed_clean with the state (same format as the state crosswalk's state_clean) or leave it blank if it can't be determined.
+#All register years are included (city_years). 1907+ city_employed holds compact run-together place names (e.g. "DC", "NavyYdNewYork", "KansasCity").
+#Cities already filled in crosswalk_state_from_city_emp_filled.csv keep their filled value in the new crosswalk (carried over by exact city string), so nothing hand-filled
+#is lost when the crosswalk is regenerated. n, the years and the context columns are computed over all years.
+city_years <- 1817:1959
+overwrite_city <- FALSE   #kept separate from `overwrite` so re-running this script never wipes a filled city crosswalk by accident
+city_path <- file.path(crosswalk_dir, "crosswalk_state_from_city_emp.csv")
+city_filled_path <- file.path(crosswalk_dir, "crosswalk_state_from_city_emp_filled.csv")
+
+if (file.exists(city_path) && !overwrite_city) {
+  message("Skipping city: crosswalk already exists (set overwrite_city <- TRUE to replace)")
+} else {
+  city_rows <- read_csv(register_path,
+                        col_select = all_of(c("year", "city_employed", "state_employed", "state_appointed", "state_born", "department", "office")),
+                        col_types = cols(.default = col_character())) %>%
+    mutate(year = as.integer(year)) %>%
+    filter(year %in% city_years, !is.na(city_employed), is.na(state_employed))
+
+  #For each city, the most common values of a context column as "value (count); ..."
+  city_top_context <- function(col, k = 5) {
+    city_rows %>%
+      filter(!is.na(.data[[col]])) %>%
+      count(city_employed, value = .data[[col]], name = "n_value") %>%
+      arrange(city_employed, desc(n_value)) %>%
+      group_by(city_employed) %>%
+      slice_head(n = k) %>%
+      summarise(!!str_c(col, "_context") := str_c(value, " (", n_value, ")", collapse = "; "), .groups = "drop")
+  }
+
+  city_crosswalk <- city_rows %>%
+    group_by(city_employed) %>%
+    summarise(n = n(), first_year = min(year), last_year = max(year), .groups = "drop") %>%
+    arrange(desc(n)) %>%
+    left_join(city_top_context("state_appointed"), by = "city_employed") %>%
+    left_join(city_top_context("state_born"),      by = "city_employed") %>%
+    left_join(city_top_context("department", k = 3), by = "city_employed") %>%
+    left_join(city_top_context("office", k = 3),     by = "city_employed") %>%
+    mutate(state_employed_clean = NA_character_)
+
+  #Carry over the hand-filled states from the filled crosswalk
+  if (file.exists(city_filled_path)) {
+    already_filled <- read_csv(city_filled_path, col_types = cols(.default = col_character()), na = character(), show_col_types = FALSE) %>%
+      transmute(city_employed, filled_state = na_if(str_squish(state_employed_clean), "")) %>%
+      filter(!is.na(filled_state))
+    if (anyDuplicated(already_filled$city_employed)) stop("crosswalk_state_from_city_emp_filled.csv has duplicated cities")
+    city_crosswalk <- city_crosswalk %>%
+      left_join(already_filled, by = "city_employed") %>%
+      mutate(state_employed_clean = filled_state) %>%
+      select(-filled_state)
+    lost <- setdiff(already_filled$city_employed, city_crosswalk$city_employed)
+    if (length(lost) > 0) { message("city: filled cities no longer in the register (not carried over):"); print(lost) }
+  }
+
+  write_csv(city_crosswalk, city_path, na = "")
+  message("city: ", nrow(city_crosswalk), " unique cities (", sum(!is.na(city_crosswalk$state_employed_clean)), " already filled, carried over from ",
+          basename(city_filled_path), "; ", nrow(city_rows), " rows with a city but no state, ", min(city_years), "-", max(city_years), ") -> ", city_path)
+}

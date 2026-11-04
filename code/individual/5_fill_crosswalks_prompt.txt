@@ -59,3 +59,93 @@ __________________________________
 
 _________________________________
 Instructions to subagent: Follow C:\Users\Lucas\AppData\Local\Temp\claude\C--Users-Lucas-Dropbox-bureaucracy--1817-1959-code-occupation-classification\7d53ab56-0c86-431d-9c5a-7f1fe29a9848\scratchpad\pos_review_hi_addendum.md (it points you to pos_review_instructions.md, which you must also read in full). NNN = 010: input review_hi010.csv, outputs rev_hi010.csv and revlog_hi010.txt in pos_review_hi_out. Every source and every output is mandatory; check every row individually. Confidence standard (use this exactly): HIGH only if every component is printed in the SAME-YEAR list(s) of the title's register years, or the title is a whole printed entry or only full words; MEDIUM if any component is missing from a title year's list or the lists differ across the title's years. Dictionary dash entries (meaning starting with an em-dash) are mechanical guesses: open the page image to resolve any ditto your decision depends on. Inserted words: do NOT add or keep 'of', 'in', 'on' or 'to' unless the printed list itself prints it as part of that entry. Write revlog_hi010.txt before your final step. Put helpers in SP\work_hi010\ and do not touch other agents' files.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+_____________________
+Please fill the spreadsheet named "crosswalk_state_from_city_emp_filled" in C:\Users\Lucas\Box\Administrative Origins\Data Generation\1. Individual\Input\b. Disambiguation Crosswalks. 
+
+You may use information from C:\Users\Lucas\Box\Administrative Origins\Data Generation\1. Individual\Input\c. Abbreviations or search the web. Your goal is to match expert human coders. If you are uncertain about a response, please leave it blank. Individuals employed in foreign nations should have the nation listed as their state of employment. Those employed in multiple states or in ambiguous states should be left blank. Some work in river systems; if that river system is entirely or nearly entirely in one state (e.g. Saginaw river in MI), list that state.
+
+Please process each individually, not in batches. When deploying subagents, insist on using the dictionary lookup for any uncertain terms, and flag especially uncertain ones for later human parsing. Accuracy here is important. Do you have any questions before beginning?
+
+
+_________________________
+I looked at the files and have a few questions before I start.
+
+What I found
+
+The folder has no file called crosswalk_state_from_city_emp_filled. The closest is crosswalk_state_from_city_emp.csv. It has about 11,200 rows and an empty state_employed_clean column to fill.
+A few rows are already filled in, such as DC, New York and Boston. Others are blank, such as Mare Island, Navy Yard Philadelphia, San Francisco and Chicago.
+The columns state_appointed_context, state_born_context, department_context and office_context could help with ambiguous places.
+
+Questions
+
+Output file: Should I write a new crosswalk_state_from_city_emp_filled.csv and leave the original untouched? I’d recommend that.
+Existing values: Should I keep the values already in state_employed_clean, or re-check them too? I’d recommend keeping them and only filling the blanks. I’d also flag any existing value that looks wrong.
+Value format: Should state values use full names (“Pennsylvania”, “New York”), as the existing ones do? The existing values include “DC”, so I’d keep that and use full country names for foreign places.
+Flagging: Should I add a confidence or flag_for_review column and a short notes column, with the blank-by-design cases marked? I’d recommend this for the uncertain ones. Alternatively, I can write the flagged items to a separate review file and leave the main file in your original columns.
+Context columns: Is it fine to use the appointed and born state counts as evidence for ambiguous names such as “Springfield”, “Portland” or “Columbia”? I would only fill those when one state clearly dominates and other evidence agrees, and otherwise leave them blank.
+Scope of the work: There are about 11,200 rows. Should I process all of them, or start with the highest-n rows (for example n ≥ 20) as a first pass? I’d recommend a first pass, since the long tail of misspelled or garbled cities takes much longer.
+
+Two limits to know about:
+
+The abbreviation files are PDFs. I’ll look up uncertain terms in them and in the hand-entered CSVs. Some of the PDFs may be scanned, which makes lookup slower.
+“Process each individually” means each row gets its own decision, with no bulk pattern-matching. That is slow at this scale, so question 6 matters.
+
+______________________________
+1) Fill the original
+2) Keep already filled values
+3) Yes
+4) Confidence with low, medium, high
+5) Yes
+6) All, but start with high-n
+
+Slow is fine; proceed in batches and deploy subagents to work in parallel. Do not take any time-saving shortcuts, but duly consider each entry.
+
+
+_____________________________
+
+
+Task and inputs
+
+Each agent acts as an expert human coder assigning the state of employment for 75 place strings. The instructions say accuracy matters more than speed and each row gets individual consideration.
+It reads a per-batch dossier first. The dossier has each string, its n and years, and the context columns (appointed states, born states, departments, offices), treated as suggestive evidence only. It also has pre-pulled hits from the abbreviation key and the hand-entered tables.
+It may grep the full dictionary text and the hand-entered CSVs itself.
+It writes city_employed, state_employed_clean, confidence, notes for every row and runs a validator before finishing.
+
+Decision rules
+
+Format: Use full state names, “DC” for Washington, and the country name for foreign places. Canal Zone is “Panama”, and territories use their own names.
+Blank when unsure: Leave the state blank if the person worked in multiple states, if the name is ambiguous and context doesn’t clearly resolve it, or if the string is generic or garbled.
+Rivers and regions: Regions (Mississippi River, Atlantic coast) are blank. A river system or harbor entirely or nearly entirely in one state gets that state (Saginaw River → Michigan).
+Fixed sites: Forts, navy yards, arsenals, lighthouses and ports get the state where they are physically located.
+Ambiguous names: Names like Portland, Springfield and Charleston are filled only when one state clearly dominates in the context and other evidence agrees.
+Vessels: Tenders, light vessels, snag boats, dredges, towboats and transports are blank unless the string itself names a single-state place. Appointee majority alone isn’t enough. This rule was added after batch 017.
+Confidence: Every row is high, medium or low. Medium and low filled rows must carry “REVIEW” in the notes.
+
+Evidence tags
+
+Every note must start with [DICT], [WEB] or [NOHIT], followed by a short reason.
+[NOHIT] is forbidden for truncated abbreviations (Ft, Cmp, Fld, Tndr, Stmr and similar). Those need a real dictionary decode or a web search.
+The validator checks row count, order, confidence values, tags and REVIEW flags.
+Agents must use WebSearch for places they can’t place confidently, and are told how to load it.
+
+Where this is falling short
+
+Early versions: The agents ran against earlier versions of the instructions. Batches 001–008 and some later ones were launched before the abbreviation rule and the vessels policy existed, so they filled many vessels from appointee majority. I plan to re-check those in a final pass.
+Web search: Several agents (013, 015, 019 and others) used web search lightly or not at all, even when they flagged places that needed it. The validator can’t enforce that.
+Dictionary: Many [DICT] tags rest on generic hits like “Ft = Fort” rather than the specific place, because the key’s two-column OCR is messy.
+Review: A final audit will re-verify the abbreviated-name rows and the vessel fills before anything goes into your crosswalk.
