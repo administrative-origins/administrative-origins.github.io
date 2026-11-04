@@ -67,7 +67,7 @@
 
                 <li><strong>Apply crosswalks and additional cleaning</strong> Applies the filled crosswalks to the master register to produce standardized state, district and position fields. Where a row has a city but no raw state, the work state is filled from the city crosswalk, and a new flag <code>state_employed_from_city</code> marks those rows (raw columns are left as transcribed). A few misspellings in the hand fill (&ldquo;Phillipines&rdquo;, &ldquo;Kanas&rdquo;, &ldquo;Inidana&rdquo;) and a Pittsburg slip are corrected. Also corrects the shifted &ldquo;D C D C D C&rdquo; entries in the compact registers, blanks the 1881&ndash;1891 district column (which holds field-service headings, not congressional districts), and converts pay strings into a comparable yearly figure. Output: <code>all_registers_1817_1959_clean.csv</code>, which completes Phase 1.</li>
 
-                <li><strong>Descriptive</strong> Tabulates and plots coverage by year for each cleaned field, birthplace patterns, compensation in nominal and real dollars (using the Officer&ndash;Williamson price and wage series), and employment geography (including Washington, DC vs. elsewhere excluding the War and Navy departments). Pay types now separate &ldquo;See footnote&rdquo; entries, and early military ranks with no printed figure, from &ldquo;No amount&rdquo;. Tables and figures are written to <code>Output/Tables</code> and <code>Output/Figures</code>.</li>
+                <li><strong>Descriptive</strong> Tabulates and plots coverage by year for each cleaned field, birthplace patterns, compensation in nominal and real dollars (using the Officer&ndash;Williamson price and wage series), and employment geography. Pay types now separate &ldquo;See footnote&rdquo; entries, and early military ranks with no printed figure, from &ldquo;No amount&rdquo;. Tables and figures are written to <code>Output/Tables</code> and <code>Output/Figures</code>.</li>
             </ol>
         </section>
 
@@ -123,7 +123,6 @@
             <div class="figure-grid">
                 <figure><a href="images/individual/state_employed_heatmap.gif?v=20261104" target="_blank"><img src="images/individual/state_employed_heatmap.gif?v=20261104" alt="Share of employees working in each state, by register year (animated)" loading="lazy"></a><figcaption>Share of employees working in each state, by register year (animated)</figcaption></figure>
                 <figure><a href="images/individual/employed_dc_vs_elsewhere.png?v=20261104" target="_blank"><img src="images/individual/employed_dc_vs_elsewhere.png?v=20261104" alt="Where employees worked: Washington, DC vs. elsewhere" loading="lazy"></a><figcaption>Where employees worked: Washington, DC vs. elsewhere</figcaption></figure>
-                <figure><a href="images/individual/employed_dc_vs_elsewhere_excl_war_navy.png?v=20261104" target="_blank"><img src="images/individual/employed_dc_vs_elsewhere_excl_war_navy.png?v=20261104" alt="Where employees worked: Washington, DC vs. elsewhere, excluding War and Navy" loading="lazy"></a><figcaption>Where employees worked: Washington, DC vs. elsewhere, excluding War and Navy</figcaption></figure>
             </div>
         </section>
 
